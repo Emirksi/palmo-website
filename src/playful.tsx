@@ -56,7 +56,7 @@ export function HandMarquee() {
         <Marquee key={r} reverse={r === 1} speed={48}>
           {row.map(l => (
             <span key={l} className="hm-tile">
-              <img src={`/img/thumbs/${l}.webp`} alt={`ASL letter ${l}`} width={160} height={190} loading="lazy" />
+              <img src={`${import.meta.env.BASE_URL}img/thumbs/${l}.webp`} alt={`ASL letter ${l}`} width={160} height={190} loading="lazy" />
               <b>{l}</b>
             </span>
           ))}

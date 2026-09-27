@@ -5,7 +5,7 @@ import { motion, useReducedMotion, AnimatePresence, type TargetAndTransition, ty
 // display's full frame rate; the drawn frames (public/img/anim) are only used for the face:
 // blinking, mouth shapes, closed happy eyes, sleeping.
 export type MascotMood = 'idle' | 'talk' | 'cheer' | 'sleep'
-const img = (name: string) => `/img/anim/${name}.webp`
+const img = (name: string) => `${import.meta.env.BASE_URL}img/anim/${name}.webp`
 const ALL = ['blink-1', 'blink-2', 'blink-3', 'talk-1', 'talk-2', 'talk-3', 'talk-4', 'cheer-3', 'cheer-4', 'cheer-8', 'sleep-1', 'sleep-2', 'sleep-3', 'sleep-4']
 
 const BODY: Record<string, { animate: TargetAndTransition; transition: Transition }> = {

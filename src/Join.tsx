@@ -33,7 +33,7 @@ export default function Join() {
       <header className="join-top"><Logo /><Link to="/" className="back-link">← Back to home</Link></header>
       <main className="join-main">
         <motion.div className="join-greet" initial={{ opacity: 0, y: reduce ? 0 : 12 }} animate={{ opacity: 1, y: 0 }} transition={spring}>
-          <motion.img key={done ? 'cheer' : 'wave'} src={`/img/mascot/${done ? 'cheer' : 'wave'}.webp`} alt="" aria-hidden width={320} height={320} className="join-mascot"
+          <motion.img key={done ? 'cheer' : 'wave'} src={`${import.meta.env.BASE_URL}img/mascot/${done ? 'cheer' : 'wave'}.webp`} alt="" aria-hidden width={320} height={320} className="join-mascot"
             initial={{ scale: reduce ? 1 : 0.7, rotate: reduce ? 0 : -6 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 16 }} />
           <div className="bubble-say">{done ? 'Yay! See you soon.' : "Hi, I'm Mitt! Want to learn to sign with me?"}</div>
         </motion.div>

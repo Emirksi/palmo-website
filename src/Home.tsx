@@ -209,7 +209,7 @@ function Glove() {
         </div>
         <Pop className="glove-stage">
           <div className="glove-figure">
-            <img src="/img/glove.webp" alt="Concept render of the Palmo sensor glove" width={760} height={1105} loading="lazy" decoding="async" />
+            <img src={`${import.meta.env.BASE_URL}img/glove.webp`} alt="Concept render of the Palmo sensor glove" width={760} height={1105} loading="lazy" decoding="async" />
             <div className="buzz" key={pulse} style={{ left: `${tip.x}%`, top: `${tip.y}%` }} aria-hidden><i className="buzz-halo" /><span /><span /><span /><i className="buzz-core" /></div>
           </div>
           <AnimatePresence mode="wait">
@@ -238,8 +238,8 @@ function Play() {
         <Fade delay={0.1}><p className="body">Lessons are pretty short, you go through the letters one by one, play some games with the ones you already know and Mitt, our little blue glove, gets really happy every time you finish one.</p></Fade>
       </div>
       <div className="play-art">
-        <motion.div className="play-phone back" style={{ y: back }}><Pop delay={0.15} drop><Phone src="/img/screens/games.webp" alt="The games hub" /></Pop></motion.div>
-        <motion.div className="play-phone front" style={{ y: front }}><Pop drop><Phone src="/img/screens/home-top.webp" alt="The journey path of letters" /></Pop></motion.div>
+        <motion.div className="play-phone back" style={{ y: back }}><Pop delay={0.15} drop><Phone src={`${import.meta.env.BASE_URL}img/screens/games.webp`} alt="The games hub" /></Pop></motion.div>
+        <motion.div className="play-phone front" style={{ y: front }}><Pop drop><Phone src={`${import.meta.env.BASE_URL}img/screens/home-top.webp`} alt="The journey path of letters" /></Pop></motion.div>
         <motion.div className="play-mascot" style={{ y: bob }}><Pop delay={0.45} jump><MascotOnView /></Pop></motion.div>
       </div>
     </section>
@@ -256,7 +256,7 @@ function Alphabet() {
       {playful ? <HandMarquee /> : <motion.ul className="alpha-grid" initial="hide" whileInView="show" viewport={{ once: true, margin: '0px 0px -10% 0px' }} transition={{ staggerChildren: 0.03 }}>
         {ALPHABET.map(l => (
           <motion.li key={l} className="alpha-tile" variants={{ hide: { opacity: 0, y: reduce ? 0 : 18, scale: reduce ? 1 : 0.94 }, show: { opacity: 1, y: 0, scale: 1 } }} transition={{ duration: 0.6, ease }}>
-            <img src={`/img/thumbs/${l}.webp`} alt={`ASL letter ${l}`} width={160} height={190} loading="lazy" />
+            <img src={`${import.meta.env.BASE_URL}img/thumbs/${l}.webp`} alt={`ASL letter ${l}`} width={160} height={190} loading="lazy" />
             <span>{l}</span>
           </motion.li>
         ))}
@@ -294,9 +294,9 @@ function Finish() {
       {playful && <Wave />}
       <Fade className="finish-node-wrap">
         <motion.div className="finish-node" animate={reduce ? undefined : { y: [0, -8, 0] }} transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}>
-          <img src="/img/thumbs/L.webp" alt="" width={160} height={190} loading="lazy" />
+          <img src={`${import.meta.env.BASE_URL}img/thumbs/L.webp`} alt="" width={160} height={190} loading="lazy" />
         </motion.div>
-        <motion.img className="finish-mascot" src="/img/mascot/wave.webp" alt="" aria-hidden width={320} height={320} loading="lazy"
+        <motion.img className="finish-mascot" src={`${import.meta.env.BASE_URL}img/mascot/wave.webp`} alt="" aria-hidden width={320} height={320} loading="lazy"
           animate={reduce ? undefined : { rotate: [0, -6, 4, -6, 0] }} transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 2.2 }} />
       </Fade>
       <Lines className="h2 center" lines={['Your first letter is L.']} />

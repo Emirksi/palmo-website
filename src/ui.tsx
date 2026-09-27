@@ -4,15 +4,22 @@ import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, ArrowDown } from '@phosphor-icons/react'
 
 // ---------- routing (three pages, no router dependency) ----------
+function currentPath() {
+  const path = window.location.pathname.slice(import.meta.env.BASE_URL.length - 1)
+  return path.replace(/\/$/, '') || '/'
+}
+function routeUrl(to: string) {
+  return to.startsWith('/') ? `${import.meta.env.BASE_URL}${to.slice(1)}` : to
+}
 export function navigate(to: string) {
-  if (to === window.location.pathname) { window.scrollTo({ top: 0 }); return }
-  window.history.pushState({}, '', to)
+  if (to === currentPath()) { window.scrollTo({ top: 0 }); return }
+  window.history.pushState({}, '', routeUrl(to))
   window.dispatchEvent(new PopStateEvent('popstate'))
   window.scrollTo({ top: 0 })
 }
 export function usePath() {
-  const [path, setPath] = useState(window.location.pathname)
-  useEffect(() => { const on = () => setPath(window.location.pathname); window.addEventListener('popstate', on); return () => window.removeEventListener('popstate', on) }, [])
+  const [path, setPath] = useState(currentPath)
+  useEffect(() => { const on = () => setPath(currentPath()); window.addEventListener('popstate', on); return () => window.removeEventListener('popstate', on) }, [])
   return path
 }
 export function Link({ to, className, children, ...rest }: { to: string; className?: string; children: ReactNode; 'aria-label'?: string }) {
@@ -20,14 +27,14 @@ export function Link({ to, className, children, ...rest }: { to: string; classNa
     if (to.startsWith('#') || e.metaKey || e.ctrlKey || e.shiftKey) return
     e.preventDefault(); navigate(to)
   }
-  return <a href={to} className={className} onClick={onClick} {...rest}>{children}</a>
+  return <a href={routeUrl(to)} className={className} onClick={onClick} {...rest}>{children}</a>
 }
 
 // ---------- brand: the mascot is the logo ----------
 export function Logo() {
   return (
     <Link to="/" className="logo" aria-label="Palmo home">
-      <img src="/img/mascot/logo.webp" alt="" width={34} height={34} />
+      <img src={`${import.meta.env.BASE_URL}img/mascot/logo.webp`} alt="" width={34} height={34} />
       <span>Palmo</span>
     </Link>
   )
@@ -91,13 +98,12 @@ function handStyle(letter: string): CSSProperties {
 export function SpellingHand({ letter, className, preload = [] }: { letter: string; className?: string; preload?: string[] }) {
   return (
     <div className={`spelling-hand ${className ?? ''}`} aria-hidden>
-      <div className="preload">{preload.map(l => <img key={l} src={`/img/hands/${l}.webp`} alt="" />)}</div>
+      <div className="preload">{preload.map(l => <img key={l} src={`${import.meta.env.BASE_URL}img/hands/${l}.webp`} alt="" />)}</div>
       <AnimatePresence initial={false}>
-        <motion.img key={letter} src={`/img/hands/${letter}.webp`} alt="" className="hand-img" style={handStyle(letter)}
+        <motion.img key={letter} src={`${import.meta.env.BASE_URL}img/hands/${letter}.webp`} alt="" className="hand-img" style={handStyle(letter)}
           initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.01 }}
           transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }} />
       </AnimatePresence>
     </div>
   )
 }
-
