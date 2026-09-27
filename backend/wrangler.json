@@ -1,0 +1,20 @@
+{
+  "name": "palmo-waitlist",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-27",
+  "account_id": "100e0965e38d9195af10c47667907d2f",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "vars": { "ALLOWED_ORIGINS": "https://emirksi.github.io" },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "palmo-waitlist",
+    "database_id": "bc62c1dc-d182-4f82-bad2-e159b599075f"
+  }],
+  "ratelimits": [{
+    "name": "SIGNUP_LIMIT",
+    "namespace_id": "9272601",
+    "simple": { "limit": 10, "period": 60 }
+  }]
+}

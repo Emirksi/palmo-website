@@ -41,13 +41,13 @@ export function Logo() {
 }
 
 // ---------- buttons: the app's own (ink fill, 16px radius, arrow on the right) ----------
-type ButtonProps = { to?: string; onClick?: () => void; variant?: 'primary' | 'secondary' | 'brand'; arrow?: 'right' | 'down' | 'none'; children: ReactNode; type?: 'button' | 'submit'; wide?: boolean; small?: boolean }
-export function Button({ to, onClick, variant = 'primary', arrow = 'right', children, type = 'button', wide, small }: ButtonProps) {
+type ButtonProps = { to?: string; onClick?: () => void; variant?: 'primary' | 'secondary' | 'brand'; arrow?: 'right' | 'down' | 'none'; children: ReactNode; type?: 'button' | 'submit'; wide?: boolean; small?: boolean; disabled?: boolean }
+export function Button({ to, onClick, variant = 'primary', arrow = 'right', children, type = 'button', wide, small, disabled }: ButtonProps) {
   const Icon = arrow === 'right' ? ArrowRight : arrow === 'down' ? ArrowDown : null
   const cls = `btn btn-${variant}${wide ? ' btn-wide' : ''}${small ? ' btn-small' : ''}`
   const inner = <><span>{children}</span>{Icon && <Icon className="btn-icon" size={small ? 16 : 18} weight="bold" aria-hidden />}</>
   if (to) return <Link to={to} className={cls}>{inner}</Link>
-  return <button type={type} className={cls} onClick={onClick}>{inner}</button>
+  return <button type={type} className={cls} onClick={onClick} disabled={disabled}>{inner}</button>
 }
 
 // ---------- motion ----------

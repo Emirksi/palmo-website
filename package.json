@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "test": "node --test backend/worker.test.js",
     "dev": "vite --host 127.0.0.1 --port 5175",
     "build": "tsc -b && vite build && node scripts/pages-routes.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 5176"
