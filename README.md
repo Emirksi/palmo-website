@@ -2,7 +2,7 @@
   <img src="public/img/mascot/logo.webp" width="72" alt="Mitt, the Palmo mascot" />
 </p>
 
-<h1 align="center">Palmo</h1>
+<h1 align="center">Palmo "Website"</h1>
 
 <p align="center">
   <strong>Learn to sign, one hand at a time.</strong><br />
