@@ -10,7 +10,7 @@ function setup() {
   const env = {
     ALLOWED_ORIGINS: 'https://emirksi.github.io',
     SIGNUP_LIMIT: { limit: async () => ({ success: true }) },
-    DB: { prepare: sql => ({ bind: (...values) => ({ run: async () => db.prepare(sql).run(...values) }) }) },
+    DB: { prepare: sql => ({ bind: (...values) => ({ run: async () => db.prepare(sql).run(...values), first: async () => db.prepare(sql).get(...values) || null }) }) },
   }
   const request = (body, options = {}) => new Request('https://api.example/waitlist', {
     method: 'POST', headers: { Origin: env.ALLOWED_ORIGINS, 'Content-Type': 'application/json' }, body: JSON.stringify(body), ...options,
@@ -30,6 +30,49 @@ test('persists a normalized signup once, including duplicate retries', async t =
   assert.equal(rows[0].email, 'test@example.com')
   assert.ok(rows[0].created_at)
   assert.equal(rows[0].consent_version, 'waitlist-2026-09-27')
+})
+
+test('sends one confirmation for duplicate and concurrent signups', async t => {
+  const { db, env, request } = setup(); t.after(() => db.close())
+  env.BREVO_API_KEY = 'test-only'; env.BREVO_SENDER_EMAIL = 'sender@example.com'
+  let sent = 0
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    assert.equal(url, 'https://api.brevo.com/v3/smtp/email')
+    const body = JSON.parse(options.body)
+    assert.deepEqual(body.to, [{ email: 'test@example.com' }])
+    assert.equal(body.sender.email, env.BREVO_SENDER_EMAIL)
+    sent++
+    return Response.json({ messageId: 'test-message' }, { status: 201 })
+  })
+  await Promise.all([1, 2, 3].map(() => worker.fetch(request({ email: 'test@example.com' }), env)))
+  assert.equal(sent, 1)
+  assert.equal(db.prepare('SELECT state FROM confirmations').get().state, 'accepted')
+})
+
+test('preserves signup on rejection and permits a throttled retry', async t => {
+  const { db, env, request } = setup(); t.after(() => db.close())
+  env.BREVO_API_KEY = 'test-only'; env.BREVO_SENDER_EMAIL = 'sender@example.com'
+  let sent = 0
+  t.mock.method(globalThis, 'fetch', async () => { sent++; return Response.json({}, { status: sent === 1 ? 429 : 201 }) })
+  assert.equal((await worker.fetch(request({ email: 'test@example.com' }), env)).status, 200)
+  assert.equal(db.prepare('SELECT state FROM confirmations').get().state, 'failed')
+  await worker.fetch(request({ email: 'test@example.com' }), env)
+  assert.equal(sent, 1)
+  db.exec('UPDATE confirmations SET attempted_at = 0')
+  await worker.fetch(request({ email: 'test@example.com' }), env)
+  assert.equal(sent, 2)
+  assert.equal(db.prepare('SELECT count(*) AS n FROM waitlist').get().n, 1)
+})
+
+test('does not resend after an ambiguous network failure', async t => {
+  const { db, env, request } = setup(); t.after(() => db.close())
+  env.BREVO_API_KEY = 'test-only'; env.BREVO_SENDER_EMAIL = 'sender@example.com'
+  let sent = 0
+  t.mock.method(globalThis, 'fetch', async () => { sent++; throw new Error('timeout') })
+  await worker.fetch(request({ email: 'test@example.com' }), env)
+  await worker.fetch(request({ email: 'test@example.com' }), env)
+  assert.equal(sent, 1)
+  assert.equal(db.prepare('SELECT state FROM confirmations').get().state, 'unknown')
 })
 
 test('rejects invalid email, malformed JSON, bot field and oversized bodies without storing', async t => {

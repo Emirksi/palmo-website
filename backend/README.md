@@ -5,7 +5,9 @@ Cloudflare Workers Free and D1 store one normalized email, signup timestamp, and
 There is no public endpoint for listing emails. Use your authenticated Cloudflare dashboard:
 **Storage & databases → D1 → palmo-waitlist → Studio → waitlist**.
 
-No confirmation or invitation emails are sent by this backend. Sending invitations is a separate step.
+Confirmation emails use Brevo's transactional API. Store `BREVO_API_KEY` and `BREVO_SENDER_EMAIL` as Worker secrets; never commit either value. Sending launch invitations is a separate step.
+Apply the additive schema before deploying: `wrangler d1 execute palmo-waitlist --config backend/wrangler.json --remote --file backend/schema.sql`.
+The confirmations table records pending, sending, accepted, failed, or unknown delivery attempts. Accepted means Brevo accepted the message, not proof it reached an inbox. Concurrent/repeated signups cannot resend accepted emails. Rejected requests can retry on resubmission after one minute. Ambiguous network/server failures and interrupted sends require checking Brevo logs before manually resetting their state to pending; they are deliberately not retried automatically. Missing email configuration preserves a pending record. There is no automatic retry scheduler or retroactive mailing to existing signups.
 Old preview signups saved only in a visitor's browser were never submitted and must be entered again.
 
 ## Operations

@@ -1,3 +1,5 @@
+import { sendConfirmation } from './confirmation.js'
+
 const MAX_BODY = 4096
 
 async function readBody(request) {
@@ -65,6 +67,9 @@ export default {
       await env.DB.prepare('INSERT INTO waitlist (email, consent_version) VALUES (?, ?) ON CONFLICT(email) DO NOTHING').bind(email, 'waitlist-2026-09-27').run()
     } catch {
       return reply(503, { error: 'We could not save your spot. Please try again.' })
+    }
+    try { await sendConfirmation(env, email) } catch {
+      console.error('Confirmation processing failed; signup remains saved.')
     }
     return reply(200, { success: true })
   },

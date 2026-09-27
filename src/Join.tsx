@@ -70,7 +70,7 @@ export default function Join() {
             {!done ? (
               <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <h1 className="join-title">Save your spot.</h1>
-                <p className="join-text">We're letting a small group in first, leave your email and we'll only email you once when it's your turn.</p>
+                <p className="join-text">We're letting a small group in first. Leave your email for a signup confirmation and an invitation when it's your turn.</p>
                 <form className="join-form" onSubmit={submit} noValidate aria-busy={pending}>
                   <label className="field-label" htmlFor="email">Email</label>
                   <input id="email" className="field" type="email" inputMode="email" autoComplete="email" placeholder="you@example.com" value={email} maxLength={254} disabled={pending}
@@ -79,7 +79,7 @@ export default function Join() {
                   <div hidden aria-hidden="true"><label htmlFor="website">Website</label><input id="website" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={e => setWebsite(e.target.value)} /></div>
                   <Button type="submit" wide disabled={pending}>{pending ? 'Saving your spot…' : 'Join the waitlist'}</Button>
                 </form>
-                <p id="fine-print" className="fine-print">No spam, no sharing. One email when it's your turn.</p>
+                <p id="fine-print" className="fine-print">No spam. A confirmation now, an invitation when it's ready.</p>
               </motion.div>
             ) : (
               <motion.div key="done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
