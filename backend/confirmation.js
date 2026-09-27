@@ -6,8 +6,8 @@ export const confirmationHtml = `<!doctype html>
 <div style="display:none;max-height:0;overflow:hidden;mso-hide:all">A little hello from Mitt. Your place on the Palmo waitlist is saved.</div>
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f6f5f1"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:520px">
-<tr><td style="padding:0 8px 24px;font-size:26px;font-weight:700;letter-spacing:-1px;color:#2b4acb">palmo<span style="color:#20201e">.</span></td></tr>
 <tr><td bgcolor="#ffffff" style="padding:32px 28px;border:1px solid #e8e6e0;border-radius:24px">
+<img src="https://emirksi.github.io/palmo-website/img/email/palmo-wordmark.png" width="112" height="36" alt="Palmo" style="display:block;width:112px;height:36px;border:0;margin:0 0 28px">
 <img src="https://emirksi.github.io/palmo-website/img/mascot/wave-email.png" width="112" height="112" alt="Mitt, Palmo’s blue glove mascot, waving hello" style="display:block;width:112px;height:112px;border:0;margin:0 0 24px">
 <h1 style="margin:0 0 24px;font-size:32px;line-height:1.15;letter-spacing:-1px;font-weight:700;color:#20201e">We saved you a spot.</h1>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.7">Hi there,</p>

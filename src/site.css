@@ -35,8 +35,8 @@ button { font: inherit; }
 .note { font-size: 14px; color: var(--ink-3); }
 
 /* ============================================================ logo */
-.logo { display: inline-flex; align-items: center; gap: 9px; font-weight: 700; font-size: 18px; letter-spacing: -0.03em; color: var(--ink); }
-.logo img { width: 34px; height: 34px; margin: -2px 0; }
+.logo { display: inline-flex; align-items: center; flex: none; min-height: 44px; }
+.logo img { width: 100px; height: auto; }
 
 /* ============================================================ buttons (the app's) */
 .btn {
@@ -101,8 +101,7 @@ button { font: inherit; }
   display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
   font-size: 14px; color: var(--ink-3); border-top: 1px solid var(--hairline);
 }
-.footer .logo { font-size: 16px; }
-.footer .logo img { width: 28px; height: 28px; }
+.footer .logo img { width: 98px; }
 .footer-links { display: flex; gap: 22px; font-weight: 500; }
 .footer-links a:hover { color: var(--ink); }
 
@@ -397,7 +396,7 @@ button { font: inherit; }
 .wave { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(160px, 20vw, 280px); z-index: 0; }
 .wave path { fill: var(--brand); }
 .home.is-playful .footer { max-width: none; background: var(--brand); color: rgba(255,255,255,.72); border-top: 0; padding-left: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter))); padding-right: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter))); }
-.home.is-playful .footer .logo { color: #fff; }
+.home.is-playful .footer .logo img { filter: brightness(0) invert(1); }
 .home.is-playful .footer-links a:hover { color: #fff; }
 
 /* ============================================================ design panel (localhost only) */

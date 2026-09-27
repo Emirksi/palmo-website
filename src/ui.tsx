@@ -30,12 +30,10 @@ export function Link({ to, className, children, ...rest }: { to: string; classNa
   return <a href={routeUrl(to)} className={className} onClick={onClick} {...rest}>{children}</a>
 }
 
-// ---------- brand: the mascot is the logo ----------
 export function Logo() {
   return (
     <Link to="/" className="logo" aria-label="Palmo home">
-      <img src={`${import.meta.env.BASE_URL}img/mascot/logo.webp`} alt="" width={34} height={34} />
-      <span>Palmo</span>
+      <img src={`${import.meta.env.BASE_URL}img/brand/palmo-wordmark.svg`} alt="" width={338} height={110} />
     </Link>
   )
 }
