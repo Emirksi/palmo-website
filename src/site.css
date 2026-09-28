@@ -71,10 +71,6 @@ button { font: inherit; }
   display: flex; align-items: center; justify-content: space-between; gap: 20px;
   transition: background-color .3s, box-shadow .3s;
 }
-.nav.is-scrolled .nav-inner {
-  background: rgba(245,243,238,.78); backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5);
-  box-shadow: 0 0 0 1px rgba(25,24,22,.05), 0 12px 30px -18px rgba(25,24,22,.35);
-}
 .nav-links { display: flex; gap: 30px; font-size: 15px; font-weight: 500; color: var(--ink-2); }
 .nav-links a { transition: color .2s; }
 .nav-links a:hover { color: var(--ink); }
@@ -208,10 +204,10 @@ button { font: inherit; }
 .word { display: flex; flex-wrap: wrap; gap: 8px; min-height: 52px; }
 .word-tile {
   width: 42px; height: 46px; border: 0; border-radius: 12px; cursor: pointer; font-weight: 500; font-size: 17px; color: rgba(255,255,255,.75);
-  background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+  background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 10px 22px -10px rgba(0,0,0,0);
   transition: color .3s, background-color .3s, box-shadow .3s, transform .35s var(--ease);
 }
-.word-tile.is-on { color: var(--brand); background: #fff; box-shadow: 0 10px 22px -10px rgba(0,0,0,.5); transform: translateY(-3px); }
+.word-tile.is-on { color: var(--brand); background: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0), 0 10px 22px -10px rgba(0,0,0,.5); transform: translateY(-3px); }
 .try { display: flex; gap: 8px; flex-wrap: wrap; }
 .try-word { border: 0; background: transparent; color: rgba(255,255,255,.55); font-weight: 700; font-size: 14px; letter-spacing: .05em; padding: 6px 10px; border-radius: 10px; cursor: pointer; transition: background-color .2s, color .2s; }
 .try-word:hover { background: rgba(255,255,255,.12); color: #fff; }
@@ -392,7 +388,7 @@ button { font: inherit; }
 .hm-tile:hover { transform: translateY(-6px) rotate(-2deg); }
 
 .finish.is-playful { position: relative; padding-bottom: clamp(200px, 22vw, 300px); }
-.finish.is-playful > *:not(.wave) { position: relative; z-index: 1; }
+.finish.is-playful > *:not(.wave):not(.pattern) { position: relative; z-index: 1; }
 .wave { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(160px, 20vw, 280px); z-index: 0; }
 .wave path { fill: var(--brand); }
 .home.is-playful .footer { max-width: none; background: var(--brand); color: rgba(255,255,255,.72); border-top: 0; padding-left: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter))); padding-right: max(var(--gutter), calc((100vw - 1240px) / 2 + var(--gutter))); }
@@ -475,3 +471,22 @@ html:has(.page.join), body:has(.page.join) { overflow: hidden; height: 100%; }
   box-shadow: 0 12px 28px -10px rgba(0,0,0,.45); opacity: 0; transform: translateY(-4px); transition: opacity .18s, transform .18s var(--ease);
 }
 .info-btn:hover + .info-tip, .info-btn:focus-visible + .info-tip { opacity: 1; transform: none; }
+
+/* ============================================================ side patterns */
+.pattern { position: absolute; z-index: 0; pointer-events: none; overflow: hidden; }
+.pattern canvas { display: block; }
+.pattern-left { left: calc(50% - 50vw); }
+.pattern-right { right: calc(50% - 50vw); }
+.why, .play, .finish { position: relative; }
+.why > :not(.pattern):not(.signoff), .play > :not(.pattern), .finish > :not(.pattern):not(.wave) { position: relative; z-index: 1; }
+.pt-why { top: -170px; height: 580px; width: max(300px, calc(50vw - 420px)); }
+.pt-play { top: -40px; height: 620px; width: max(300px, calc(50vw - 260px)); }
+.pt-finish { bottom: clamp(160px, 16vw, 240px); height: 500px; width: max(320px, calc(50vw - 330px)); }
+.finish .wave { z-index: 1; }
+/* the "I love you" sign-off beside the why sentence */
+.signoff { position: absolute; z-index: 0; pointer-events: none; left: calc(50% - 50vw); top: -60px; width: max(270px, calc(50vw - 430px)); height: 440px; }
+.signoff canvas { display: block; transform-origin: 50% 100%; }
+.signoff.is-settled canvas { animation: breathe 4.8s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: translateY(-3px) scale(1.012); } }
+@media (prefers-reduced-motion: reduce) { .signoff.is-settled canvas { animation: none; } }
+@media (max-width: 900px) { .pattern, .signoff { display: none; } }

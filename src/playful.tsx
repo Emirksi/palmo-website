@@ -34,7 +34,7 @@ export function Marquee({ children, reverse, speed = 40, className }: { children
 }
 
 // Who SignSense is for. (When real partners exist, this is where their logos go.)
-const MADE_FOR = ['Hearing parents of Deaf kids', 'Brothers & sisters', 'Grandparents', 'Classmates', 'Teachers', 'Future interpreters', 'Coworkers', 'Anyone curious']
+const MADE_FOR = ['Hearing parents of Deaf kids', 'Classmates', 'Teachers', 'Future interpreters', 'Coworkers', 'Anyone curious']
 export function MadeFor() {
   return (
     <section className="logos" aria-label="Made for">

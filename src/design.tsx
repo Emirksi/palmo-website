@@ -3,6 +3,11 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 // Local design controls: swap fonts and compare the calm vs playful versions.
 // Only shown on localhost (dev) or with ?design in the URL.
 export type Version = 'calm' | 'playful'
+export type PatternShape = 'ribbon' | 'ripples' | 'orb' | 'hands' | 'off'
+const PATTERNS: { id: PatternShape; label: string }[] = [
+  { id: 'ripples', label: 'Ripples' }, { id: 'ribbon', label: 'Ribbon' }, { id: 'orb', label: 'Orb' }, { id: 'hands', label: 'Hands' }, { id: 'off', label: 'Off' },
+]
+const isPattern = (v: unknown): v is PatternShape => PATTERNS.some(p => p.id === v)
 type Font = { id: string; label: string; stack: string; google?: string; fontshare?: string }
 
 export const FONTS: Font[] = [
@@ -21,12 +26,12 @@ export const FONTS: Font[] = [
 const FALLBACK = ", -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif"
 const KEY = 'signsense.design'
 
-type Design = { version: Version; font: string; setVersion: (v: Version) => void; setFont: (f: string) => void }
-const Ctx = createContext<Design>({ version: 'playful', font: 'satoshi', setVersion: () => {}, setFont: () => {} })
+type Design = { version: Version; font: string; pattern: PatternShape; setVersion: (v: Version) => void; setFont: (f: string) => void; setPattern: (p: PatternShape) => void }
+const Ctx = createContext<Design>({ version: 'playful', font: 'satoshi', pattern: 'ripples', setVersion: () => {}, setFont: () => {}, setPattern: () => {} })
 export const useDesign = () => useContext(Ctx)
 
-function load(): { version: Version; font: string } {
-  try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); return { version: s.version === 'calm' ? 'calm' : 'playful', font: s.font || 'satoshi' } } catch { return { version: 'playful', font: 'satoshi' } }
+function load(): { version: Version; font: string; pattern: PatternShape } {
+  try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); return { version: s.version === 'calm' ? 'calm' : 'playful', font: s.font || 'satoshi', pattern: isPattern(s.pattern) ? s.pattern : 'ripples' } } catch { return { version: 'playful', font: 'satoshi', pattern: 'ripples' } }
 }
 
 function applyFont(id: string) {
@@ -45,12 +50,12 @@ export function DesignProvider({ children }: { children: ReactNode }) {
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(state)) } catch { /* ignore */ } }, [state])
   useEffect(() => { if (state.font !== 'satoshi') applyFont(state.font); else { document.documentElement.style.removeProperty('--font'); document.documentElement.style.removeProperty('--font-display') } }, [state.font])
   useEffect(() => { document.documentElement.dataset.version = state.version }, [state.version])
-  const value: Design = { ...state, setVersion: version => setState(s => ({ ...s, version })), setFont: font => setState(s => ({ ...s, font })) }
+  const value: Design = { ...state, setVersion: version => setState(s => ({ ...s, version })), setFont: font => setState(s => ({ ...s, font })), setPattern: pattern => setState(s => ({ ...s, pattern })) }
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
 export function DesignPanel() {
-  const { version, font, setVersion, setFont } = useDesign()
+  const { version, font, pattern, setVersion, setFont, setPattern } = useDesign()
   const [open, setOpen] = useState(true)
   const show = import.meta.env.DEV || new URLSearchParams(window.location.search).has('design')
   if (!show) return null
@@ -65,6 +70,10 @@ export function DesignPanel() {
           <label className="dp-label" htmlFor="dp-font">Font</label>
           <select id="dp-font" value={font} onChange={e => setFont(e.target.value)}>
             {FONTS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+          </select>
+          <label className="dp-label" htmlFor="dp-pattern">Side pattern</label>
+          <select id="dp-pattern" value={pattern} onChange={e => setPattern(e.target.value as PatternShape)}>
+            {PATTERNS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
           </select>
           <p className="dp-note">Only visible on localhost.</p>
         </div>
