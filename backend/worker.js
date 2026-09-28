@@ -1,4 +1,5 @@
 import { sendConfirmation } from './confirmation.js'
+import { unsubscribe } from './unsubscribe.js'
 
 const MAX_BODY = 4096
 
@@ -25,6 +26,7 @@ async function readBody(request) {
 
 export default {
   async fetch(request, env) {
+    if (new URL(request.url).pathname === '/unsubscribe') return unsubscribe(request, env)
     const origin = request.headers.get('Origin')
     const allowed = (env.ALLOWED_ORIGINS || '').split(',').includes(origin)
     const headers = {

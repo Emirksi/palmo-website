@@ -10,3 +10,8 @@ CREATE TABLE IF NOT EXISTS confirmations (
   attempted_at INTEGER,
   message_id TEXT
 ) STRICT;
+
+CREATE TABLE IF NOT EXISTS unsubscribe_tokens (
+  email TEXT PRIMARY KEY NOT NULL REFERENCES waitlist(email) ON DELETE CASCADE,
+  token TEXT NOT NULL UNIQUE
+) STRICT;

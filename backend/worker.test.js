@@ -10,7 +10,14 @@ function setup() {
   const env = {
     ALLOWED_ORIGINS: 'https://emirksi.github.io',
     SIGNUP_LIMIT: { limit: async () => ({ success: true }) },
-    DB: { prepare: sql => ({ bind: (...values) => ({ run: async () => db.prepare(sql).run(...values), first: async () => db.prepare(sql).get(...values) || null }) }) },
+    DB: {
+      prepare: sql => ({ bind: (...values) => ({ run: async () => db.prepare(sql).run(...values), first: async () => db.prepare(sql).get(...values) || null }) }),
+      batch: async statements => {
+        db.exec('BEGIN')
+        try { const results = []; for (const statement of statements) results.push(await statement.run()); db.exec('COMMIT'); return results }
+        catch (error) { db.exec('ROLLBACK'); throw error }
+      },
+    },
   }
   const request = (body, options = {}) => new Request('https://api.example/waitlist', {
     method: 'POST', headers: { Origin: env.ALLOWED_ORIGINS, 'Content-Type': 'application/json' }, body: JSON.stringify(body), ...options,
@@ -110,4 +117,62 @@ test('rate limits submissions and fails closed if storage or limiter is unavaila
   assert.equal(failed.status, 503)
   assert.equal((await failed.text()).includes('private database detail'), false)
   assert.equal(db.prepare('SELECT count(*) AS n FROM waitlist').get().n, 0)
+})
+
+test('email unsubscribe link confirms before removing only its recipient, and is safe to repeat', async t => {
+  const { db, env, request } = setup(); t.after(() => db.close())
+  env.BREVO_API_KEY = 'test-only'; env.BREVO_SENDER_EMAIL = 'sender@example.com'
+  const emails = []
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    emails.push(JSON.parse(options.body)); return Response.json({ messageId: 'test-message' }, { status: 201 })
+  })
+  await worker.fetch(request({ email: 'test@example.com' }), env)
+  await worker.fetch(request({ email: 'other@example.com' }), env)
+  const link = emails[0].htmlContent.match(/href="([^"]+\/unsubscribe\?token=[a-f0-9]{64})"/)?.[1]
+  assert.ok(link, 'HTML email includes the recipient-specific unsubscribe button')
+  assert.ok(emails[0].textContent.includes(link))
+  assert.ok(!link.includes('test@example.com'))
+  assert.ok(!emails[1].htmlContent.includes(link))
+  for (const method of ['GET', 'HEAD']) {
+    const preview = await worker.fetch(new Request(link, { method }), env)
+    assert.equal(preview.status, 200)
+    assert.equal(preview.headers.get('Referrer-Policy'), 'same-origin')
+    assert.equal(db.prepare('SELECT count(*) AS n FROM waitlist').get().n, 2)
+  }
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const response = await worker.fetch(new Request(link, { method: 'POST', headers: { Origin: new URL(link).origin } }), env)
+    assert.equal(response.status, 200)
+    assert.match(await response.text(), /You’re unsubscribed/)
+  }
+  assert.deepEqual(db.prepare('SELECT email FROM waitlist').all().map(r => r.email), ['other@example.com'])
+  assert.equal(db.prepare('SELECT count(*) AS n FROM confirmations WHERE email = ?').get('test@example.com').n, 0)
+  assert.equal(db.prepare('SELECT count(*) AS n FROM unsubscribe_tokens WHERE email = ?').get('test@example.com').n, 0)
+  await worker.fetch(request({ email: 'test@example.com' }), env)
+  assert.ok(!emails[2].htmlContent.includes(link), 'rejoining gets a new token')
+  await worker.fetch(new Request(link, { method: 'POST' }), env)
+  assert.equal(db.prepare('SELECT count(*) AS n FROM waitlist').get().n, 2, 'old link cannot cancel a new signup')
+})
+
+test('unsubscribe rejects malformed links, cross-origin submissions and unsupported methods', async t => {
+  const { db, env } = setup(); t.after(() => db.close())
+  for (const token of ['', 'user@example.com', '<script>', 'a'.repeat(65)]) {
+    const response = await worker.fetch(new Request(`https://api.example/unsubscribe?token=${encodeURIComponent(token)}`), env)
+    assert.equal(response.status, 400)
+    assert.ok(!(await response.text()).includes('<script>'))
+  }
+  const link = `https://api.example/unsubscribe?token=${'a'.repeat(64)}`
+  assert.equal((await worker.fetch(new Request(link, { method: 'PUT' }), env)).status, 405)
+  assert.equal((await worker.fetch(new Request(link, { method: 'POST', headers: { Origin: 'https://evil.example' } }), env)).status, 403)
+})
+
+test('unsubscribe rolls back all changes when storage fails', async t => {
+  const { db, env } = setup(); t.after(() => db.close())
+  db.exec("INSERT INTO waitlist(email, consent_version) VALUES ('test@example.com', 'test'); INSERT INTO confirmations(email) VALUES ('test@example.com')")
+  db.prepare('INSERT INTO unsubscribe_tokens(email, token) VALUES (?, ?)').run('test@example.com', 'a'.repeat(64))
+  db.exec("CREATE TRIGGER fail_delete BEFORE DELETE ON waitlist BEGIN SELECT RAISE(ABORT, 'private detail'); END")
+  const response = await worker.fetch(new Request(`https://api.example/unsubscribe?token=${'a'.repeat(64)}`, { method: 'POST' }), env)
+  assert.equal(response.status, 503)
+  assert.ok(!(await response.text()).includes('private detail'))
+  assert.equal(db.prepare('SELECT count(*) AS n FROM waitlist').get().n, 1)
+  assert.equal(db.prepare('SELECT count(*) AS n FROM confirmations').get().n, 1)
 })
