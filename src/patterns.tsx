@@ -129,10 +129,11 @@ async function hand(g: Grid, letter: string) {
 
 const HAND_FOR: Record<string, string> = { why: 'V', play: 'W', finish: 'Y' }
 
-type Props = { slot: 'why' | 'play' | 'finish'; side: 'left' | 'right'; phase?: number; flipY?: boolean; drift?: number; delay?: number }
+type Props = { slot: 'why' | 'play' | 'finish'; side: 'left' | 'right'; shape?: PatternShape; phase?: number; flipY?: boolean; drift?: number; delay?: number }
 
-export function Pattern({ slot, side, phase = 0, flipY = false, drift = 50, delay = 0 }: Props) {
-  const { pattern } = useDesign()
+export function Pattern({ slot, side, shape, phase = 0, flipY = false, drift = 50, delay = 0 }: Props) {
+  const { pattern: selectedPattern } = useDesign()
+  const pattern = shape ?? selectedPattern
   const wrap = useRef<HTMLDivElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
   const reduce = useReducedMotion()

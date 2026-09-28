@@ -234,7 +234,7 @@ function Play() {
   const bob = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [40, -80])
   return (
     <section className="section play" id="play" ref={ref}>
-      <Pattern slot="play" side="right" phase={4.1} flipY />
+      <Pattern slot="play" side="right" shape="ripples" phase={4.1} flipY />
       <div className="play-copy">
         <Lines className="h2" lines={['A streak you’ll', 'want to keep.']} />
         <Fade delay={0.1}><p className="body">Lessons are pretty short, you go through the letters one by one, play some games with the ones you already know and Mitt, our little blue glove, gets really happy every time you finish one.</p></Fade>
@@ -294,7 +294,7 @@ function Finish() {
   return (
     <section className={`finish${playful ? ' is-playful' : ''}`} aria-labelledby="finish-title">
       {playful && <Wave />}
-      <Pattern slot="finish" side="left" phase={2.2} delay={0.2} />
+      <Pattern slot="finish" side="left" shape="ribbon" phase={2.2} delay={0.2} />
       <Fade className="finish-node-wrap">
         <motion.div className="finish-node" animate={reduce ? undefined : { y: [0, -8, 0] }} transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}>
           <img src={`${import.meta.env.BASE_URL}img/thumbs/L.webp`} alt="" width={160} height={190} loading="lazy" />
